@@ -144,13 +144,6 @@ const withdraw = (req, res) => {
     if (!wallet)
         return res.status(404).json({ status: 'fail', message: "cannot find wallet" });
 
-    // if (wallet.sold <= depositAmount) {
-    //     return res.status(400)
-    //         .json({
-    //             status: 'cannot withdraw because sold will be under 0',
-    //             data: { wallet }
-    //         })
-    // }
     wallet.sold = wallet.sold - depositAmount;
 
     writeWallet();
