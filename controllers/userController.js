@@ -1,71 +1,63 @@
-import fs from "fs/promises";
+// import fs from "fs/promises";
+import fs, { writeFile } from 'fs'
+
 import path from "path";
 
 const filePath = path.resolve("data/users.json");
-
-// Helper function → read users
-export const readUsers = async () => {
-    const data = await fs.readFile(filePath, "utf-8");
-    if (!data || data.trim() == ''){
-        return []
-    }
-        return JSON.parse(data);
-};
-
-// Helper function → write users
-const writeUsers = async (users) => {
-    await fs.writeFile(filePath, JSON.stringify(users, null, 2));
-};
-
+// read users:
+const users = JSON.parse(fs.readFileSync(`./data/users.json`, 'utf-8'));
+console.log(users);
 // CREATE USER
-const createUser = async (req, res, next) => {
-    try {
-        const { name, email, phone } = req.body;
+const createUser = (req, res) => {
 
-        const users = await readUsers();
+    const { name, email, phone } = req.body;
 
-        const newUser = {
-            id: users.length ? users[users.length - 1].id + 1 : 1,
-            name,
-            email,
-            phone,
-        };
+    const newUser = {
+        id: users.length ? users[users.length - 1].id + 1 : 1,
+        name,
+        email,
+        phone,
+    };
 
-        users.push(newUser);
+    users.push(newUser);
 
-        await writeUsers(users);
-
-        res.status(201).json(newUser);
-    } catch (error) {
-        next(error);
-    }
+    fs.writeFile('./data/users.json', JSON.stringify(users), err => {
+        res.status(200).json({
+            status: "success",
+            data: {
+                user: newUser
+            }
+        });
+    });
 };
 
-// GET ALL USERS
-const getUsers = async (req, res, next) => {
-    try {
-        const users = await readUsers();
-        res.status(200).json(users);
-    } catch (error) {
-        next(error);
-    }
-};
-
-// GET USER BY ID
-const getUsersById = async (req, res, next) => {
-    try {
-        const id = req.params.id;
-        const users = await readUsers();
-        const user = users.find(u => u.id == req.params.id);
-
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
+const getAllUsers = (req, res) => {
+    res.status(200).json({
+        status: "success",
+        result: users.length,
+        data: {
+            users
         }
+    })
+}
 
-        res.status(200).json(user);
-    } catch (error) {
-        next(error);
-    }
+const getUsersById = (req, res) => {
+    const id = req.params.id;
+    const user = users.find(u => u.id == id);
+
+    if (!user) {
+        return res.status(404).json({
+            status: "fail",
+            message: "cannot find user"
+        });
+    };
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            user
+        }
+    });
 };
 
-export { createUser, getUsers, getUsersById };
+export { createUser, getAllUsers, getUsersById };

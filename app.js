@@ -7,5 +7,7 @@ app.use(express.json())
 
 app.use('/users', userRoute);
 app.use('/wallets', walletRoutes);
+app.use('/wallets/deposit', walletRoutes);
+app.use('/wallets/withdraw', walletRoutes);
 
 export default app
