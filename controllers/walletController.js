@@ -6,7 +6,6 @@ let walletIdCounter = 0;
 
 const wallets = JSON.parse(fs.readFileSync(`./data/wallets.json`, 'utf-8'));
 const users = JSON.parse(fs.readFileSync(`./data/users.json`, 'utf-8'));
-console.log(wallets);
 
 const writeWallet = () => {
     fs.writeFileSync('./data/wallets.json', JSON.stringify(wallets));
@@ -15,7 +14,6 @@ const writeWallet = () => {
 const createWallet = (req, res, next) => {
     const { userID, name } = req.body;
     const userExist = users.find(u => u.id == userID);
-    console.log(userExist);
     if (!userExist) {
         return res.status(404).json({ message: 'user dose not exist' });
     }
@@ -140,16 +138,19 @@ const withdraw = (req, res) => {
         return res.status(400).json({ status: 'fail', message: "invalid amount!" })
 
     const wallet = wallets.find(w => w.id == id);
+
+    console.log(wallet);
+
     if (!wallet)
         return res.status(404).json({ status: 'fail', message: "cannot find wallet" });
 
-    if (wallet.sold <= depositAmount) {
-        return res.status(400)
-            .json({
-                status: 'fail',
-                data: { wallet }
-            })
-    }
+    // if (wallet.sold <= depositAmount) {
+    //     return res.status(400)
+    //         .json({
+    //             status: 'cannot withdraw because sold will be under 0',
+    //             data: { wallet }
+    //         })
+    // }
     wallet.sold = wallet.sold - depositAmount;
 
     writeWallet();

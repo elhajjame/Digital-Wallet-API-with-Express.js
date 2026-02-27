@@ -6,7 +6,6 @@ import path from "path";
 const filePath = path.resolve("data/users.json");
 // read users:
 const users = JSON.parse(fs.readFileSync(`./data/users.json`, 'utf-8'));
-console.log(users);
 // CREATE USER
 const createUser = (req, res) => {
 
